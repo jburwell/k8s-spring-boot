@@ -32,7 +32,6 @@ public class Endpoint {
     private final ConcurrentMap<String, Value> kvStore;
 
     public Endpoint() {
-        // TODO Calculate parallel factor?
         kvStore = new ConcurrentHashMap<>();
     }
 
