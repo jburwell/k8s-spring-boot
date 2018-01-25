@@ -36,3 +36,9 @@ jv is deployed to a Kubernetes cluster a NodePort service listening on port 3008
 ```
 kubectl create -f jv-kube-config.yaml
 ```
+
+If jv is deployed to minikube, the URL for the endpoint can be access in the following manner:
+
+```
+curl http://$(minikube ip):30080/
+```
