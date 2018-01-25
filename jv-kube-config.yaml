@@ -42,6 +42,19 @@ spec:
   type: NodePort
 
 ---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: jv-config-map
+  namespace: jv
+data:
+  java.heapSize: "512m"
+  logging.level.net.cockamamy: "DEBUG"
+  server.undertow.ioThreads: "5"
+  server.undertow.workerThreads: "10"
+  spring.main.bannerMode: "off"
+
+---
 kind: Deployment
 apiVersion: apps/v1beta2
 metadata:
@@ -66,15 +79,30 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: JAVA_HEAP_SIZE
-          value: "512m"
+          valueFrom:
+            configMapKeyRef:
+              name: jv-config-map
+              key: java.heapSize
         - name: logging.level.net.cockamamy
-          value: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              name: jv-config-map
+              key: logging.level.net.cockamamy
         - name: "SERVER_UNDERTOW_IO_THREADS"
-          value: "5"
+          valueFrom:
+            configMapKeyRef:
+              name: jv-config-map
+              key: server.undertow.ioThreads
         - name: "SERVER_UNDERTOW_WORKER_THREADS"
-          value: "10"
+          valueFrom:
+            configMapKeyRef:
+              name: jv-config-map
+              key: server.undertow.workerThreads
         - name: "SPRING_MAIN_BANNER_MODE"
-          value: "off"
+          valueFrom:
+            configMapKeyRef:
+              name: jv-config-map
+              key: spring.main.bannerMode
         resources:
           requests:
             memory: "768Mi"
