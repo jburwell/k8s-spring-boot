@@ -1,0 +1,108 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: jv
+
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: jv-service-user
+  namespace: jv
+automountServiceAccountToken: false
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: jv-service-role-binding
+  namespace: jv
+subjects:
+- kind: ServiceAccount
+  name: jv-service-user
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jv-service
+  namespace: jv
+spec:
+  selector:
+    app: jv
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+    nodePort: 30080
+  type: NodePort
+
+---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  name: jv-deployment
+  namespace: jv
+  labels:
+    app: jv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jv
+  template:
+    metadata:
+      labels:
+        app: jv
+    spec:
+      serviceAccountName: jv-service-user
+      containers:
+      - name: jv-server
+        image: "net.cockamamy.jv/jv-server"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JAVA_HEAP_SIZE
+          value: "512m"
+        - name: logging.level.net.cockamamy
+          value: DEBUG
+        - name: "SERVER_UNDERTOW_IO_THREADS"
+          value: "5"
+        - name: "SERVER_UNDERTOW_WORKER_THREADS"
+          value: "10"
+        - name: "SPRING_MAIN_BANNER_MODE"
+          value: "off"
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - name: api-port
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /health
+            port: api-port
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /health
+            port: api-port
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
