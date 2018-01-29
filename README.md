@@ -2,7 +2,6 @@
 
 jv is a simplistic, in-memory KV store that implements the following REST interface:
 
-|-------|-------|-----------|
 |URI    |Method |Description|
 |-------|-------|-----------|
 |``/api/objects/<key>``|DELETE|Deletes the object identified by ``<key>`` and returns the value of the deleted object.|
