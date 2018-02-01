@@ -40,10 +40,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/objects")
+@RequestMapping(Endpoint.BASE_URI)
 public class Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(Endpoint.class);
+
+    static final String BASE_URI = "/api/objects/";
 
     private final ConcurrentMap<String, Value> kvStore;
 

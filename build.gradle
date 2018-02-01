@@ -16,10 +16,11 @@
 buildscript {
     repositories {
       mavenCentral()
+      maven { url "https://repo.spring.io/libs-snapshot" }
     }
     dependencies {
         classpath "org.junit.platform:junit-platform-gradle-plugin:1.0.2"
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.0.0.BUILD-SNAPSHOT"
     }
 }
 
@@ -43,6 +44,7 @@ repositories {
   mavenCentral()
   jcenter()
   maven { url "https://jitpack.io" }
+  maven { url "https://repo.spring.io/libs-snapshot/" }
 }
 
 ext {
@@ -61,7 +63,10 @@ ext {
         jupiter: "5.0.2",
     ],
     spring: [
-        boot: "1.5.9.RELEASE",
+//        boot: "1.5.9.RELEASE",
+        boot: "2.0.0.BUILD-SNAPSHOT",
+        core: "5.0.3.RELEASE",
+        test_junit5: "1.0.3"
     ]
   ]
 }
@@ -87,11 +92,23 @@ junitPlatform {
 
 dependencies {
     compile "com.google.guava:guava:${versions.guava}"
+//    compile "org.springframework:spring-core:${versions.spring.core}"
+//    compile "org.springframework:spring-web:${versions.spring.core}"
+//    compile "org.springframework:spring-webmvc:${versions.spring.core}"
+//    compile ("org.springframework.boot:spring-boot-starter:${versions.spring.boot}") {
+//        exclude module: "org.springframework:spring-core"
+//    }
+//    compile "org.springframework.boot:spring-boot-actuator:${versions.spring.boot}"
+//    compile "org.springframework.boot:spring-boot-starter-undertow:${versions.spring.boot}"
+
     compile ("org.springframework.boot:spring-boot-starter-web:${versions.spring.boot}") {
-        exclude module: "spring-boot-starter-tomcat"
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-json"
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+        exclude group: "org.hibernate.validator", module: "hibernate-validator"
     }
-    compile "org.springframework.boot:spring-boot-starter-actuator:${versions.spring.boot}"
-    compile "org.springframework.boot:spring-boot-starter-undertow:${versions.spring.boot}"
+    compile ("org.springframework.boot:spring-boot-starter-undertow:${versions.spring.boot}") {
+        exclude group: "io.undertow", module: "undertow-websockets-jsr"
+    }
 
     errorprone "com.google.guava:guava:${versions.guava}"
     errorprone "com.google.errorprone:error_prone_core:${versions.errorprone}"
@@ -99,16 +116,21 @@ dependencies {
     testCompile "org.junit.platform:junit-platform-launcher:${versions.junit.platform}"
     testCompile "com.github.jlink:jqwik:${versions.jqwik}"
     testCompile "org.junit.jupiter:junit-jupiter-engine:${versions.junit.jupiter}"
-
     testCompile "org.assertj:assertj-core:${versions.assertj.core}"
     testCompile "org.assertj:assertj-guava:${versions.assertj.guava}"
-    testCompile "com.google.guava:guava-testlib:${versions.guava}"
+    testCompile ("com.google.guava:guava-testlib:${versions.guava}") {
+        exclude group: "junit", module: "junit"
+    }
+    testCompile ("org.springframework.boot:spring-boot-starter-test:${versions.spring.boot}") {
+        exclude group: "junit", module: "junit"
+    }
 }
 
 docker {
-    dependsOn test, jar, bootRepackage
+//    dependsOn test, jar, bootJar
     name "${group}/${jar.baseName}"
     dockerfile file("Dockerfile")
     files jar.archivePath
     buildArgs([JAR_FILE: "${jar.archiveName}"])
 }
+

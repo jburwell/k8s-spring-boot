@@ -1,5 +1,6 @@
-build
 .gradle
+build
+out
 
 .gradletasknamecache
 .jqwik-database
