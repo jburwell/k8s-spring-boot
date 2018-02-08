@@ -35,7 +35,7 @@ plugins {
 apply plugin: "org.junit.platform.gradle.plugin"
 apply plugin: "org.springframework.boot"
 
-jar {
+bootJar {
   baseName = "jv-server"
   version = "0.1.0-SNAPSHOT"
 }
@@ -92,15 +92,6 @@ junitPlatform {
 
 dependencies {
     compile "com.google.guava:guava:${versions.guava}"
-//    compile "org.springframework:spring-core:${versions.spring.core}"
-//    compile "org.springframework:spring-web:${versions.spring.core}"
-//    compile "org.springframework:spring-webmvc:${versions.spring.core}"
-//    compile ("org.springframework.boot:spring-boot-starter:${versions.spring.boot}") {
-//        exclude module: "org.springframework:spring-core"
-//    }
-//    compile "org.springframework.boot:spring-boot-actuator:${versions.spring.boot}"
-//    compile "org.springframework.boot:spring-boot-starter-undertow:${versions.spring.boot}"
-
     compile ("org.springframework.boot:spring-boot-starter-web:${versions.spring.boot}") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-json"
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
@@ -127,10 +118,10 @@ dependencies {
 }
 
 docker {
-//    dependsOn test, jar, bootJar
-    name "${group}/${jar.baseName}"
+    dependsOn assemble
+    name "${group}/${bootJar.baseName}"
     dockerfile file("Dockerfile")
-    files jar.archivePath
-    buildArgs([JAR_FILE: "${jar.archiveName}"])
+    files bootJar.archivePath
+    buildArgs([JAR_FILE: "${bootJar.archiveName}"])
 }
 
