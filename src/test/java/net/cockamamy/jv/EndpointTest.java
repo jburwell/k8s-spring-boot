@@ -21,13 +21,16 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.file.Files.readAllBytes;
 import static net.cockamamy.jv.Endpoint.BASE_URI;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static net.cockamamy.jv.ManagedDiagnosticContextFilter.REQUEST_ID_HEADER;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
@@ -70,7 +73,8 @@ public class EndpointTest {
         client.perform(put(uri)
             .contentType(mediaType)
             .content(content))
-            .andExpect(status().isCreated());
+            .andExpect(status().isCreated())
+            .andExpect(header().string(REQUEST_ID_HEADER, anything()));
 
         return uri;
 
@@ -102,6 +106,7 @@ public class EndpointTest {
 
         client.perform(get(objectURI))
             .andExpect(status().isOk())
+            .andExpect(header().string(REQUEST_ID_HEADER, anything()))
             .andExpect(content().contentType(mediaType))
             .andExpect(content().string(jsonObject));
 
@@ -111,6 +116,7 @@ public class EndpointTest {
     public void testUnsuccessfulGetObject(@Autowired @Nonnull final MockMvc client)
         throws Exception {
         client.perform(get(join("/", BASE_URI, randomKey())))
+            .andExpect(header().string(REQUEST_ID_HEADER, anything()))
             .andExpect(status().isNotFound());
     }
 
@@ -124,6 +130,7 @@ public class EndpointTest {
 
         client.perform(delete(objectURI))
             .andExpect(status().isOk())
+            .andExpect(header().string(REQUEST_ID_HEADER, anything()))
             .andExpect(content().contentType(mediaType))
             .andExpect(content().string(jsonObject));
 
@@ -133,6 +140,7 @@ public class EndpointTest {
     public void testUnsuccessfulDeleteObject(@Autowired @Nonnull final MockMvc client)
         throws Exception {
         client.perform(delete(join("/", BASE_URI, randomKey())))
+            .andExpect(header().string(REQUEST_ID_HEADER, anything()))
             .andExpect(status().isNotFound());
     }
 

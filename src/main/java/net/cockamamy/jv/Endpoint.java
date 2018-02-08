@@ -16,15 +16,20 @@
 
 package net.cockamamy.jv;
 
+import static com.google.common.base.Preconditions.*;
+import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotBlank;
+import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotNull;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
+import net.cockamamy.jv.util.MorePreconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -56,6 +61,8 @@ public class Endpoint {
     @GetMapping("/{key}")
     public ResponseEntity<String> getValue(@PathVariable final String key) {
 
+        checkArgumentNotBlank(key);
+
         LOG.debug("Getting object with key {}", key);
         final Value value = kvStore.get(key);
         return value == null ? ResponseEntity.notFound().build()
@@ -69,6 +76,10 @@ public class Endpoint {
         @RequestHeader("Content-Type") final MediaType contentType,
         @RequestBody final String value) {
 
+        checkArgumentNotBlank(key);
+        checkArgumentNotNull(contentType);
+        checkArgumentNotBlank(value);
+
         LOG.debug("Putting key {} with content type {} and a value of {}", key, contentType, value);
         kvStore.put(key, new Value(contentType, value));
 
@@ -76,6 +87,8 @@ public class Endpoint {
 
     @DeleteMapping("/{key}")
     public ResponseEntity<String> deleteValue(@PathVariable final String key) {
+
+        checkArgumentNotBlank(key);
 
         LOG.debug("Deleting key {}", key);
         final Value deletedValue = kvStore.remove(key);
@@ -92,8 +105,13 @@ public class Endpoint {
         private final String object;
 
         private Value(@Nonnull final MediaType contentType, @Nonnull final String object) {
+
+            checkArgumentNotNull(contentType);
+            checkArgumentNotBlank(object);
+
             this.contentType = contentType;
             this.object = object;
+
         }
 
         @Nonnull
