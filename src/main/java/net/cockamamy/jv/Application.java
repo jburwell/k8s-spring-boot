@@ -16,24 +16,35 @@
 
 package net.cockamamy.jv;
 
+import com.google.common.collect.ImmutableList;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
+import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackageClasses = Application.class)
 @ConfigurationProperties
 @Configuration
-public class Application {
+public class Application extends DelegatingWebMvcConfiguration {
 
     public Application(@Value("${spring.application.name}") final String applicationName) {
         MDC.put("appId", applicationName);
     }
 
-    public static void main(String... args) {
+    public static void main(final String... args) {
         SpringApplication.run(Application.class, args);
     }
 
+    @Override
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+        final RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
+        adapter.setResponseBodyAdvice(ImmutableList.of(new ValueHandler()));
+        return adapter;
+    }
 }
