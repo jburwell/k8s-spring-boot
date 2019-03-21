@@ -16,20 +16,8 @@
 
 package net.cockamamy.jv;
 
-import static com.google.common.base.Preconditions.*;
-import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotBlank;
-import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotNull;
-import static org.springframework.http.HttpStatus.CREATED;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import java.io.Serializable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-import net.cockamamy.jv.util.MorePreconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -44,13 +32,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
+import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotBlank;
+import static net.cockamamy.jv.util.MorePreconditions.checkArgumentNotNull;
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 @RequestMapping(Endpoint.BASE_URI)
 public class Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(Endpoint.class);
 
-    static final String BASE_URI = "/api/objects/";
+    static final String BASE_URI = "/objects/";
 
     private final ConcurrentMap<String, Value> kvStore;
 
@@ -131,7 +130,11 @@ public class Endpoint {
                 return true;
             }
 
-            if (!(thatObject instanceof Value)) {
+            if (thatObject == null) {
+                return false;
+            }
+
+            if (!getClass().equals(thatObject.getClass())) {
                 return false;
             }
 
@@ -148,7 +151,7 @@ public class Endpoint {
 
         @Override
         public String toString() {
-            return MoreObjects.toStringHelper(this)
+            return toStringHelper(this)
                 .add("contentType", contentType)
                 .add("object", object)
                 .toString();

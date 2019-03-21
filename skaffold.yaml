@@ -1,0 +1,9 @@
+apiVersion: skaffold/v1beta1
+kind: Config
+build:
+  artifacts:
+  - image: net.cockamamy.jv/jv-server
+deploy:
+  kubectl:
+    manifests:
+    - jv-kube-config.yaml

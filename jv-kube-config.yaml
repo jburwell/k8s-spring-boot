@@ -38,8 +38,22 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8080
-    nodePort: 30080
-  type: NodePort
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jv-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /jv
+        backend:
+          serviceName: test
+          servicePort: 80
 
 ---
 kind: ConfigMap
