@@ -4,9 +4,9 @@ jv is a simplistic, in-memory KV store that implements the following REST interf
 
 |URI    |Method |Description|
 |-------|-------|-----------|
-|``/api/objects/<key>``|DELETE|Deletes the object identified by ``<key>`` and returns the value of the deleted object.|
-|``/api/objects/<key>``|GET|Returns the value of the object identified by ``<key>``|
-|``/api/objects/<key>``|PUT|Adds or replaces the object identified by ``<key>``.  Updates to a key are last write wins.|
+|``/objects/<key>``|DELETE|Deletes the object identified by ``<key>`` and returns the value of the deleted object.|
+|``/objects/<key>``|GET|Returns the value of the object identified by ``<key>``|
+|``/objects/<key>``|PUT|Adds or replaces the object identified by ``<key>``.  Updates to a key are last write wins.|
 
 # Building jv
 
